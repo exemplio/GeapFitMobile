@@ -35,15 +35,15 @@ fun AgendaScreen(
     Scaffold(
     ) { padding ->
         Box(modifier = Modifier.padding(padding)) {
-            when (state) {
-                is AgendaUiState.Initial, is AgendaUiState.Loading -> {
-                    LaunchedEffect(Unit) {  }
-                    LoadingCenter()
-                }
-                is AgendaUiState.Error -> {
-                    ShowErrorMessageService((state as AgendaUiState.AgendaErrorProductState).errorMessage)
-                }
-                is AgendaUiState.Loaded -> {
+//            when (state) {
+//                is AgendaUiState.Initial, is AgendaUiState.Loading -> {
+//                    LaunchedEffect(Unit) {  }
+//                    LoadingCenter()
+//                }
+//                is AgendaUiState.Error -> {
+//                    ShowErrorMessageService((state as AgendaUiState.AgendaErrorProductState).errorMessage)
+//                }
+//                is AgendaUiState.Loaded -> {
 //                    val agenda = (state as AgendaUiState.AgendaLoadedProductState).agenda
 //                    if (agenda.isEmpty()) {
 //                        ShowErrorMessage()
@@ -60,12 +60,12 @@ fun AgendaScreen(
                             // Show agenda items here...
                         }
 //                    }
-                }
-
-                else -> {
-                    ShowErrorMessage("Unexpected state")
-                }
-            }
+//                }
+//
+//                else -> {
+//                    ShowErrorMessage("Unexpected state")
+//                }
+//            }
         }
     }
 

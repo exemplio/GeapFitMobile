@@ -25,11 +25,11 @@ sealed class BottomNavigation(
     data object TabLibrary : BottomNavigation(
         label = R.string.tab_library,
         icon = R.drawable.ic_add,
-        tabScreens = TabScreens.TabBusiness
+        tabScreens = TabScreens.TabLibrary
     )
 
     data object TabBusiness : BottomNavigation(
-        label = R.string.tab_business, icon = R.drawable.ic_reels, tabScreens = TabScreens.TabLibrary
+        label = R.string.tab_business, icon = R.drawable.ic_reels, tabScreens = TabScreens.TabBusiness
     )
 
     data object TabAgenda : BottomNavigation(

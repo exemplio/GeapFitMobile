@@ -152,7 +152,7 @@ data class LibraryItem(
 val libraryItems = listOf(
     LibraryItem(
         title = "1/2 Dominada con agarre neutro",
-        imageUrl = "https://img.youtube.com/vi/7pLlgZkOsiU/maxresdefault.jpg",
+        imageUrl = "https://img.youtube.com/vi/iqBkUGKd4Eo/maxresdefault.jpg",
         tags = listOf(
             "barra de dominadas", "bilateral", "tracción", "dominadas",
             "intermedio", "fuerza", "dorsal", "espalda", "compuesto", "tren superior"
@@ -160,7 +160,7 @@ val libraryItems = listOf(
     ),
     LibraryItem(
         title = "1/2 Dominada con agarre neutro asistida con goma",
-        imageUrl = "https://img.youtube.com/vi/j5rCQEUDtXQ/maxresdefault.jpg",
+        imageUrl = "https://img.youtube.com/vi/MPzfQMxrjdQ/maxresdefault.jpg",
         tags = listOf(
             "barra de dominadas", "goma elástica", "bilateral", "tracción",
             "dominadas", "principiante", "fuerza", "dorsal", "espalda", "compuesto", "tren superior"
@@ -168,7 +168,7 @@ val libraryItems = listOf(
     ),
     LibraryItem(
         title = "1/2 Dominada con agarre prono",
-        imageUrl = "https://img.youtube.com/vi/8B1Y8eK2y6I/maxresdefault.jpg",
+        imageUrl = "https://img.youtube.com/vi/wKBYBuqJlk8/maxresdefault.jpg",
         tags = listOf(
             "barra de dominadas", "bilateral", "tracción", "dominadas",
             "intermedio", "fuerza", "dorsal", "espalda", "compuesto", "tren superior"
