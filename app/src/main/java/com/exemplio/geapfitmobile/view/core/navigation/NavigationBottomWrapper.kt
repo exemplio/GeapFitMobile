@@ -23,7 +23,7 @@ import com.exemplio.geapfitmobile.view.home.screens.agenda.AgendaViewModel
 fun NavigationBottomWrapper(modifier: Modifier = Modifier, navHostController: NavHostController) {
     NavHost(modifier = modifier, navController = navHostController, startDestination = TabHome) {
         composable<TabHome> {
-            ClientScreen(onLogout = {
+            ClientScreen(onCloseSession = {
             })
         }
         composable<TabAgenda> {
@@ -39,7 +39,7 @@ fun NavigationBottomWrapper(modifier: Modifier = Modifier, navHostController: Na
             })
         }
         composable<TabProfile> {
-            ChatsScreen(onLogout = {
+            ChatsScreen(onCloseSession = {
             })
         }
     }

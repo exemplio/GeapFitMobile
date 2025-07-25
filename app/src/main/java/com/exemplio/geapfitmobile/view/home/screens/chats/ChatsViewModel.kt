@@ -1,11 +1,5 @@
 package com.exemplio.geapfitmobile.view.home.screens.client
 
-import ChatErrorProductState
-import ChatInitialState
-import ChatLoadedProductState
-import ChatLoadingProductState
-import ChatState
-import People
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -17,6 +11,21 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+
+data class People(
+    val name: String,
+    val avatarUrl: String,
+    val lastMessage: String,
+    val dateTime: String,
+    val unreadCount: Int
+)
+
+sealed class ChatState
+object ChatInitialState : ChatState()
+object ChatLoadingProductState : ChatState()
+data class ChatLoadedProductState(val chat: List<People>) : ChatState()
+data class ChatErrorProductState(val errorMessage: String = "NO HAY CHATS DISPONIBLE") : ChatState()
+
 
 @HiltViewModel
 class ChatsViewModel @Inject constructor(val repository: ClientRepositoryImpl) : ViewModel() {

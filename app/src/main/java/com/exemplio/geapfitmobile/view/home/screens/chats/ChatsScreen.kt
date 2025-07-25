@@ -1,4 +1,3 @@
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -7,252 +6,235 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Call
-import androidx.compose.material.icons.filled.ExitToApp
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import coil.compose.AsyncImage
+import com.exemplio.geapfitmobile.view.home.screens.agenda.AgendaViewModel
 import com.exemplio.geapfitmobile.view.home.screens.client.ChatsViewModel
 
-// --- Data Models ---
-data class People(
+data class ChatItem(
+    val initials: String,
     val name: String,
-    val avatarUrl: String,
-    val lastMessage: String,
-    val dateTime: String,
-    val unreadCount: Int
+    val date: String,
+    val lastMessage: String
 )
 
-// --- State Classes ---
-sealed class ChatState
-object ChatInitialState : ChatState()
-object ChatLoadingProductState : ChatState()
-data class ChatLoadedProductState(val chat: List<People>) : ChatState()
-data class ChatErrorProductState(val errorMessage: String = "NO HAY CHATS DISPONIBLE") : ChatState()
+val chats = listOf(
+    ChatItem("MO", "MATEO OPPEN", "01-03-2025", "Hola, bienvenido a GEAP ACADEMY! Es..."),
+    ChatItem("LL", "LAUTARO LOPEZ FERNANDEZ", "17-02-2025", "entrenamiento elite grupal"),
+    ChatItem("UH", "URIEL HENDLER", "12-02-2025", "Tenkiu"),
+    ChatItem("AB", "ADRIAN BLUM", "12-02-2025", "Welcome to the new app"),
+    ChatItem("SL", "SEBASTIÁN LIBERMAN", "11-02-2025", "Tipo medidas físicas, fotos bla bla"),
+    ChatItem("AG", "ALEJANDRO GONZÁLEZ ...", "10-02-2025", "entrenamiento elite grupal"),
+)
 
 @Composable
 fun ChatsScreen(
-    chatsViewModel: ChatsViewModel = hiltViewModel(),
-    onLogout: () -> Unit
+    chatsViewModel: ChatsViewModel = hiltViewModel(), // Use hiltViewModel() if using Hilt
+    onCloseSession: () -> Unit
 ) {
-    var showErrorDialog by remember { mutableStateOf<String?>(null) }
-    val state by remember { derivedStateOf { chatsViewModel.state } }
-    val peopleList by remember { derivedStateOf { chatsViewModel.peopleList } }
-
-    LaunchedEffect(Unit) {
-        chatsViewModel.init()
-    }
-
+    var selectedTab by remember { mutableStateOf(0) }
+    var showOnlyAssigned by remember { mutableStateOf(true) }
     Scaffold(
     ) { padding ->
-        Box(
+        Column(
             Modifier
                 .padding(padding)
                 .fillMaxSize()
-                .background(Color(0xFFF1F1F1))
+                .background(Color(0xFFF8F8F8))
         ) {
-            when (state) {
-                is ChatInitialState, is ChatLoadingProductState -> {
-                    LoadingCenter()
-                }
-                is ChatErrorProductState -> {
-                    ShowErrorMessageService((state as ChatErrorProductState).errorMessage)
-                }
-                is ChatLoadedProductState -> {
-                    val chat = (state as ChatLoadedProductState).chat
-                    if (chat.isEmpty()) {
-                        ShowErrorMessage()
-                    } else {
-                        ChatList(peopleList = chat)
-                    }
-                }
-
-                else -> {
-                    ShowErrorMessage("Unexpected state")
-                }
-            }
+            Tabs(selectedTab) { selectedTab = it }
+            CheckboxRow(showOnlyAssigned) { showOnlyAssigned = it }
+            MassMessageButton()
+            SearchField()
+            UnreadBanner(unreadCount = 0)
+            ChatListSection(chats)
         }
     }
+}
 
-    // Error dialog if needed
-    showErrorDialog?.let { message ->
-        AlertDialog(
-            onDismissRequest = { showErrorDialog = null },
-            title = { Text(message) },
-            confirmButton = {
-                TextButton(onClick = { showErrorDialog = null }) { Text("OK") }
-            }
+@Composable
+fun Tabs(selectedTab: Int, onTabSelected: (Int) -> Unit) {
+    Row(
+        Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp)
+            .clip(RoundedCornerShape(20.dp))
+            .background(Color.White)
+            .height(44.dp)
+    ) {
+        Box(
+            Modifier
+                .weight(1f)
+                .fillMaxHeight()
+                .clip(RoundedCornerShape(20.dp))
+                .background(if (selectedTab == 0) Color.Black else Color.White)
+                .clickable { onTabSelected(0) },
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                "Clientes",
+                color = if (selectedTab == 0) Color.White else Color.Black,
+                fontWeight = FontWeight.Bold,
+                fontSize = 16.sp
+            )
+        }
+        Box(
+            Modifier
+                .weight(1f)
+                .fillMaxHeight()
+                .clip(RoundedCornerShape(20.dp))
+                .background(if (selectedTab == 1) Color.Black else Color.White)
+                .clickable { onTabSelected(1) },
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                "Colaboradores",
+                color = if (selectedTab == 1) Color.White else Color.Black,
+                fontWeight = FontWeight.Medium,
+                fontSize = 16.sp
+            )
+        }
+    }
+}
+
+@Composable
+fun CheckboxRow(checked: Boolean, onCheckedChange: (Boolean) -> Unit) {
+    Row(
+        Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 10.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Checkbox(
+            checked = checked,
+            onCheckedChange = onCheckedChange,
+            colors = CheckboxDefaults.colors(checkedColor = Color.Black)
+        )
+        Text(
+            "Ver solo mis clientes asignados",
+            fontSize = 15.sp,
+            color = Color.Black
         )
     }
 }
 
 @Composable
-fun ShowErrorMessage(errorMessage: String = "NO HAY CHATS DISPONIBLE") {
-    Column(
+fun MassMessageButton() {
+    Button(
+        onClick = { /* Mass message */ },
+        colors = ButtonDefaults.buttonColors(containerColor = Color.White),
+        shape = RoundedCornerShape(16.dp),
         modifier = Modifier
-            .fillMaxSize()
-            .wrapContentSize(Alignment.Center),
-        horizontalAlignment = Alignment.CenterHorizontally
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp)
+            .height(48.dp)
     ) {
-        // Provide your warning image here if desired
-        Spacer(modifier = Modifier.height(10.dp))
-        Text(errorMessage)
+        Icon(Icons.Default.Notifications, contentDescription = null, tint = Color.Black)
+        Text(
+            "Mensaje masivo",
+            color = Color.Black,
+            fontWeight = FontWeight.Bold,
+            fontSize = 16.sp,
+            modifier = Modifier.padding(start = 6.dp)
+        )
     }
 }
 
 @Composable
-fun ShowErrorMessageService(errorMessage: String = "Test screen") {
-    Column(
+fun SearchField() {
+    OutlinedTextField(
+        value = "",
+        onValueChange = {},
+        placeholder = { Text("Buscar por nombre") },
         modifier = Modifier
-            .fillMaxSize()
-            .wrapContentSize(Alignment.Center),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Spacer(modifier = Modifier.height(10.dp))
-        Text(errorMessage)
-    }
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 8.dp),
+        shape = RoundedCornerShape(40.dp),
+        singleLine = true
+    )
 }
 
 @Composable
-fun ChatList(peopleList: List<People>) {
-    LazyColumn(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(horizontal = 20.dp, vertical = 5.dp)
+fun UnreadBanner(unreadCount: Int) {
+    Box(
+        Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp)
+            .padding(bottom = 4.dp)
+            .clip(RoundedCornerShape(12.dp))
+            .background(Color(0xFFE8F0FE))
     ) {
-        items(peopleList) { person ->
-            PeopleItem(person)
-            Spacer(modifier = Modifier.height(10.dp))
+        Row(
+            Modifier.padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text("🎂", fontSize = 17.sp)
+            Spacer(Modifier.width(10.dp))
+            Text(
+                "Tienes $unreadCount chats sin leer",
+                fontSize = 15.sp,
+                color = Color(0xFF505050)
+            )
         }
     }
 }
 
 @Composable
-fun PeopleItem(people: People) {
-    Row(
+fun ChatListSection(chats: List<ChatItem>) {
+    LazyColumn(
         modifier = Modifier
+            .fillMaxSize()
+            .padding(vertical = 4.dp)
+    ) {
+        items(chats) { chat ->
+            ChatListItem(chat)
+        }
+    }
+}
+
+@Composable
+fun ChatListItem(chat: ChatItem) {
+    Row(
+        Modifier
             .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 6.dp)
             .clip(RoundedCornerShape(16.dp))
             .background(Color.White)
             .padding(12.dp)
             .clickable { /* Navigate to chat */ },
         verticalAlignment = Alignment.CenterVertically
     ) {
-        AsyncImage(
-            model = people.avatarUrl,
-            contentDescription = people.name,
-            modifier = Modifier
-                .size(54.dp)
-                .clip(CircleShape)
-                .background(Color(0xFFE0E0E0)),
-            contentScale = ContentScale.Crop
-        )
-        Spacer(modifier = Modifier.width(14.dp))
-        Column(modifier = Modifier.weight(1f)) {
-            Text(
-                people.name,
-                fontWeight = FontWeight.Bold,
-                fontSize = 17.sp
-            )
-            Text(
-                people.lastMessage,
-                fontSize = 15.sp,
-                color = Color(0xFF757575),
-                maxLines = 1
-            )
-        }
-        Column(
-            horizontalAlignment = Alignment.End
-        ) {
-            Text(
-                people.dateTime,
-                fontSize = 13.sp,
-                color = Color(0xFFB0BEC5)
-            )
-            if (people.unreadCount > 0) {
-                Box(
-                    modifier = Modifier
-                        .padding(top = 4.dp)
-                        .size(22.dp)
-                        .clip(CircleShape)
-                        .background(Color(0xFF703EFE)),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(
-                        people.unreadCount.toString(),
-                        color = Color.White,
-                        fontSize = 13.sp,
-                        fontWeight = FontWeight.Bold
-                    )
-                }
-            }
-        }
-    }
-}
-
-// --- Bottom Bar ---
-@Composable
-fun ChatBottomBar() {
-    val context = LocalContext.current
-    Row(
-        Modifier
-            .fillMaxWidth()
-            .height(90.dp)
-            .background(Color.White, shape = RoundedCornerShape(topStart = 45.dp, topEnd = 45.dp)),
-        horizontalArrangement = Arrangement.SpaceAround,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        IconButton(onClick = {
-            // open URL
-            openUrl(context, "https://github.com/siracyakut/bytebuilders-chat-app/")
-        }) {
-            Icon(Icons.Default.Star, contentDescription = "Language", tint = Color(0xFF808080), modifier = Modifier.size(30.dp))
-        }
-        IconButton(onClick = {
-            openUrl(context, "sms:+905538543421?body=Hello+ByteBuilders!")
-        }) {
-            Icon(Icons.Default.Person, contentDescription = "Forum", tint = Color(0xFF808080), modifier = Modifier.size(30.dp))
-        }
         Box(
-            modifier = Modifier
-                .size(65.dp)
+            Modifier
+                .size(44.dp)
                 .clip(CircleShape)
-                .background(Color(0xFF703EFE))
-                .clickable { /* Add Chat */ },
+                .background(Color(0xFF703EFE)),
             contentAlignment = Alignment.Center
         ) {
-            Icon(Icons.Default.Add, contentDescription = "Add", tint = Color.White, modifier = Modifier.size(45.dp))
+            Text(chat.initials, color = Color.White, fontWeight = FontWeight.Bold, fontSize = 16.sp)
         }
-        IconButton(onClick = {
-            openUrl(context, "tel:+905538543421")
-        }) {
-            Icon(Icons.Default.Call, contentDescription = "Call", tint = Color(0xFF808080), modifier = Modifier.size(30.dp))
+        Spacer(Modifier.width(14.dp))
+        Column(modifier = Modifier.weight(1f)) {
+            Text(chat.name, fontWeight = FontWeight.Bold, fontSize = 16.sp)
+            Text(chat.lastMessage, fontSize = 14.sp, color = Color(0xFF757575), maxLines = 1, overflow = TextOverflow.Ellipsis)
         }
-        IconButton(onClick = {
-            // navigate to profile
-            // e.g., navController.navigate("profile")
-        }) {
-            Icon(Icons.Default.Person, contentDescription = "Profile", tint = Color(0xFF808080), modifier = Modifier.size(30.dp))
-        }
+        Text(
+            chat.date,
+            fontSize = 13.sp,
+            color = Color(0xFFB0BEC5),
+            modifier = Modifier.padding(start = 8.dp)
+        )
     }
-}
-
-fun openUrl(context: android.content.Context, url: String) {
-    val intent = android.content.Intent(android.content.Intent.ACTION_VIEW, android.net.Uri.parse(url))
-    context.startActivity(intent)
 }
