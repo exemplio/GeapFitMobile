@@ -11,7 +11,7 @@ import com.exemplio.geapfitmobile.view.home.HomeScreen
 @Composable
 fun NavigationWrapper() {
     val navController = rememberNavController()
-    NavHost(navController = navController, startDestination = Home) {
+    NavHost(navController = navController, startDestination = Login) {
         composable<Login> {
             LoginScreen(
                 navigateToRegister = { navController.navigate(Register) },

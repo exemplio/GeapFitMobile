@@ -43,6 +43,7 @@ class LoginViewModel @Inject constructor(val login: Login) : ViewModel() {
 
             withContext(Dispatchers.Main) {
                 if (response != null) {
+                    println("LOGIN: ${response}")
                     _uiState.update { it.copy(isUserLogged = true) }
                 }else{
                     Log.i("LOGIN", "ERROR")

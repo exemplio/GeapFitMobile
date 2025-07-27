@@ -41,7 +41,7 @@ val chats = listOf(
 
 @Composable
 fun ChatsScreen(
-    chatsViewModel: ChatsViewModel = hiltViewModel(), // Use hiltViewModel() if using Hilt
+    chatsViewModel: ChatsViewModel = hiltViewModel(),
     onCloseSession: () -> Unit
 ) {
     var selectedTab by remember { mutableStateOf(0) }
