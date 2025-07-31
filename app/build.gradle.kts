@@ -69,6 +69,7 @@ dependencies {
     implementation(libs.retrofit.adapter)
     implementation(libs.retrofit.gson)
     implementation(libs.coil.compose)
+    implementation("io.github.cdimascio:dotenv-kotlin:6.4.0")
 
     //Testing
     testImplementation(libs.junit)
