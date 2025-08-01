@@ -1,11 +1,10 @@
-package com.geapfit.utils
+package com.exemplio.geapfitmobile.utils
 
-import java.io.File
 import java.util.*
 import kotlin.math.roundToInt
 import android.content.Context
 import android.content.SharedPreferences
-import io.github.cdimascio.dotenv.dotenv
+import com.exemplio.geapfitmobile.BuildConfig
 import kotlinx.coroutines.withContext
 
 object MyUtils {
@@ -45,31 +44,22 @@ object MyUtils {
         }
     }
 
-    val DotEnv = dotenv()
-
-    val authId: String
-        get() = DotEnv["AUTH_ID"] ?: ""
-
-    val type: String
-        get() = DotEnv["CONTEXT_PATH"] ?: ""
-
-    val typeAuth: String
-        get() = DotEnv["CONTEXT_AUTH_PATH"] ?: ""
-
-    val clientId: String
-        get() = DotEnv["CLIENT_ID"] ?: ""
-
+    val authId = BuildConfig.AUTH_ID
+    val contextPath = BuildConfig.CONTEXT_PATH
+    val contextAuthPath = BuildConfig.CONTEXT_AUTH_PATH
+    val clientId = BuildConfig.CLIENT_ID
+    val type = BuildConfig.TYPE
     val base: String
-        get() = DotEnv["API_URL"] ?: ""
+        get() = BuildConfig.API_URL
 
     val baseAuth: String
-        get() = DotEnv["API_AUTH_URL"] ?: ""
+        get() = BuildConfig.API_AUTH_URL
 
     val publicKey: String
-        get() = DotEnv["PASSWORD_PUBLIC_KEY"] ?: ""
+        get() = BuildConfig.PASSWORD_PUBLIC_KEY
 
     val apiKey: String
-        get() = DotEnv["API_KEY"] ?: ""
+        get() = BuildConfig.API_KEY
 
     var uri: String = "$type/pin_pad/payment"
 

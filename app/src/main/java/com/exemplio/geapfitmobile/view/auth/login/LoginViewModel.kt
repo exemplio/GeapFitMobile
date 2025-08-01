@@ -40,7 +40,6 @@ class LoginViewModel @Inject constructor(val login: Login) : ViewModel() {
         loadingState(true)
         viewModelScope.launch(Dispatchers.IO) {
             val response = login(_uiState.value.email, _uiState.value.password)
-
             withContext(Dispatchers.Main) {
                 if (response != null) {
                     println("LOGIN: ${response}")

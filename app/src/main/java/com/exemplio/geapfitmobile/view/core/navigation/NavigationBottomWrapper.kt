@@ -14,7 +14,6 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.exemplio.geapfitmobile.data.repository.ClientRepositoryImpl
-import com.exemplio.geapfitmobile.domain.repository.ClientApiService
 import com.exemplio.geapfitmobile.view.auth.login.LoginViewModel
 import com.exemplio.geapfitmobile.view.core.navigation.TabScreens.*
 import com.exemplio.geapfitmobile.view.home.screens.agenda.AgendaViewModel

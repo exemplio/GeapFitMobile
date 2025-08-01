@@ -1,6 +1,7 @@
 package com.geapfit.utils
 
-import com.geapfit.utils.MyUtils
+import com.exemplio.geapfitmobile.utils.MyUtils
+
 
 class Path(val path: String)
 

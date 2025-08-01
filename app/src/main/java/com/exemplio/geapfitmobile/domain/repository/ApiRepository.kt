@@ -1,4 +1,4 @@
-package com.exemplio.geapfitmobile.data.datasource.api
+package com.exemplio.geapfitmobile.domain.repository
 
 import com.example.geapfit.models.CredentialModel
 import com.example.geapfit.models.PasswordGrantRequest
@@ -7,7 +7,7 @@ import com.exemplio.geapfitmobile.data.response.UserResponse
 import retrofit2.http.*
 import okhttp3.RequestBody
 
-interface ApiServices2 {
+interface ApiRepository {
     @GET("doLogin/.json")
     suspend fun doLogin(): List<UserResponse>
 

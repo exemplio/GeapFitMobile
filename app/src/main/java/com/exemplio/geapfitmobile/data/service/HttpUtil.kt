@@ -6,17 +6,18 @@ object HttpUtil {
     fun <T> result(
         response: Response,
         parseJson: ((String) -> T)? = null
-    ): Result2<T> {
+    ): Result<T?> {
         return try {
             val body = response.body?.string().orEmpty()
             if (response.isSuccessful) {
                 val obj = parseJson?.invoke(body)
-                Result2(success = true, obj = obj, raw = body)
+                Result.success(obj)
             } else {
-                Result2(success = false, errorMessage = "HTTP ${response.code}: $body", raw = body)
+                val obj2 = parseJson?.invoke(body)
+                Result.success(obj2)
             }
         } catch (e: Exception) {
-            Result2(success = false, error = e, errorMessage = e.message, stackTrace = e.stackTraceToString())
+            Result.failure(e)
         }
     }
 

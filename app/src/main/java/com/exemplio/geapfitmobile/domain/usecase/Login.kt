@@ -1,28 +1,24 @@
 package com.exemplio.geapfitmobile.domain.usecase
 
 import com.example.geapfit.models.CredentialModel
-import com.example.geapfit.models.PasswordGrantRequest
-import com.exemplio.geapfitmobile.data.datasource.api.ApiServices2
-import com.exemplio.geapfitmobile.domain.entity.UserEntity
+import com.exemplio.geapfitmobile.data.service.ApiServicesImpl
 import com.exemplio.geapfitmobile.domain.repository.AuthRepository
-import com.geapfit.services.ApiServices
 import com.geapfit.services.http.Result2
 import javax.inject.Inject
 
 class Login @Inject constructor(private val authRepository: AuthRepository,
-    private val apiService: ApiServices2
+    private val apiService: ApiServicesImpl
 ) {
-    suspend operator fun invoke(user: String, password: String): CredentialModel? {
+    suspend operator fun invoke(user: String, password: String): Result<Any>? {
         if (user.contains("@hotmail.com")) {
             return null
         }
-        val body = PasswordGrantRequest(
-            username = user,
-            password = password,
-            clientId = "your_client_id",
-            clientSecret = "your_client_secret",
-            scope = "your_scope"
+        val body = CredentialModel(
+            accessToken = "",
+            tokenType = "",
+            expiresIn = 0,
+            refreshToken = "",
         )
-        return apiService.passwordGrant("",body)
+        return apiService.resendSign(body)
     }
 }

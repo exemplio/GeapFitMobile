@@ -11,6 +11,10 @@ android {
     namespace = "com.exemplio.geapfitmobile"
     compileSdk = 35
 
+    buildFeatures {
+        buildConfig = true
+    }
+
     defaultConfig {
         applicationId = "com.exemplio.geapfitmobile"
         minSdk = 26
@@ -19,6 +23,15 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        buildConfigField ("String", "AUTH_ID", "\"your_auth_id_value\"")
+        buildConfigField ("String", "CONTEXT_PATH", "\"your_context_path_value\"")
+        buildConfigField ("String", "CONTEXT_AUTH_PATH", "\"your_context_auth_path_value\"")
+        buildConfigField ("String", "CLIENT_ID", "\"your_client_id_value\"")
+        buildConfigField ("String", "API_URL", "\"https://api.example.com\"")
+        buildConfigField ("String", "API_AUTH_URL", "\"https://auth.example.com\"")
+        buildConfigField ("String", "PASSWORD_PUBLIC_KEY", "\"your_public_key_value\"")
+        buildConfigField ("String", "TYPE", "\"your_public_key_value\"")
+        buildConfigField ("String", "API_KEY", "\"your_public_key_value\"")
     }
 
     buildTypes {
@@ -69,7 +82,6 @@ dependencies {
     implementation(libs.retrofit.adapter)
     implementation(libs.retrofit.gson)
     implementation(libs.coil.compose)
-    implementation("io.github.cdimascio:dotenv-kotlin:6.4.0")
 
     //Testing
     testImplementation(libs.junit)
