@@ -1,7 +1,5 @@
-package com.example.geapfit.models
+package com.exemplio.geapfitmobile.domain.entity
 
-import com.google.gson.Gson
-import com.google.gson.annotations.SerializedName
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
@@ -14,11 +12,11 @@ data class CredentialModel(
     @SerialName("token_type") val tokenType: String? = null,
     @SerialName("expires_in") val expiresIn: Int? = null
 ) {
-    fun toJson(): String = Json.encodeToString(CredentialModel.serializer(), this)
+    fun toJson(): String = Json.encodeToString(serializer(), this)
 
     companion object {
         fun fromJson(json: String): CredentialModel =
-            Json.decodeFromString(CredentialModel.serializer(), json)
+            Json.decodeFromString(serializer(), json)
     }
 }
 

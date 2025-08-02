@@ -12,20 +12,27 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -37,7 +44,6 @@ import com.exemplio.geapfitmobile.view.core.components.InstaButtonSecondary
 import com.exemplio.geapfitmobile.view.core.components.InstaText
 import com.exemplio.geapfitmobile.view.core.components.InstaTextField
 
-
 @Composable
 fun LoginScreen(
     loginViewModel: LoginViewModel = hiltViewModel(),
@@ -45,6 +51,17 @@ fun LoginScreen(
     navigateToHome: () -> Unit
 ) {
     val uiState by loginViewModel.uiState.collectAsStateWithLifecycle()
+
+    val showModal = remember { mutableStateOf(false) }
+    val modalMessage = remember { mutableStateOf("") }
+
+    LaunchedEffect(uiState.errorCode, uiState.errorMessage) {
+        println("SI LLEGA")
+        if (uiState.errorCode != null && uiState.errorCode != 200) {
+            modalMessage.value = uiState.errorMessage ?: "Error para conectar con el servidor"
+            showModal.value = true
+        }
+    }
 
     LaunchedEffect(uiState.isUserLogged) {
         if (uiState.isUserLogged) {
@@ -107,14 +124,6 @@ fun LoginScreen(
                     onClick = { navigateToRegister() },
                     title = stringResource(R.string.login_screen_button_register)
                 )
-                Icon(
-                    modifier = Modifier
-                        .width(60.dp)
-                        .padding(vertical = 22.dp),
-                    painter = painterResource(R.drawable.ic_meta),
-                    contentDescription = "meta logo",
-                    tint = MaterialTheme.colorScheme.onBackground
-                )
             }
         }
 
@@ -123,6 +132,18 @@ fun LoginScreen(
                 CircularProgressIndicator()
             }
         }
+
+        if (showModal.value) {
+            ModalDialog(
+                message = modalMessage.value,
+                onDismiss = {
+                    showModal.value = false;
+                    modalMessage.value = ""
+                    uiState.errorCode = null
+                    uiState.errorMessage = null
+                }
+            )
+        }
     }
 }
 
@@ -130,4 +151,28 @@ fun LoginScreen(
 @Composable
 fun LoginScreenPreview() {
     LoginScreen(navigateToRegister = {}, navigateToHome = {})
+}
+
+@Composable
+fun ModalDialog(message: String, onDismiss: () -> Unit) {
+    Dialog(onDismissRequest = onDismiss) {
+        Surface(
+            shape = MaterialTheme.shapes.medium,
+            color = MaterialTheme.colorScheme.background,
+            shadowElevation = 8.dp
+        ) {
+            Column(
+                modifier = Modifier.padding(24.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(text = "Error", style = MaterialTheme.typography.headlineSmall)
+                Spacer(modifier = Modifier.height(16.dp))
+                Text(text = message, style = MaterialTheme.typography.bodyMedium, textAlign = TextAlign.Center)
+                Spacer(modifier = Modifier.height(24.dp))
+                Button(onClick = onDismiss) {
+                    Text("OK")
+                }
+            }
+        }
+    }
 }

@@ -4,7 +4,10 @@ import android.util.Log
 import android.util.Patterns
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.exemplio.geapfitmobile.domain.entity.CredentialModel
+import com.exemplio.geapfitmobile.domain.entity.Resultado
 import com.exemplio.geapfitmobile.domain.usecase.Login
+import com.geapfit.utils.translate
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -19,7 +22,6 @@ class LoginViewModel @Inject constructor(val login: Login) : ViewModel() {
 
     private val _uiState = MutableStateFlow(LoginUiState())
     val uiState: StateFlow<LoginUiState> = _uiState
-
     fun onEmailChanged(email: String) {
         _uiState.update { state ->
             state.copy(
@@ -42,8 +44,14 @@ class LoginViewModel @Inject constructor(val login: Login) : ViewModel() {
             val response = login(_uiState.value.email, _uiState.value.password)
             withContext(Dispatchers.Main) {
                 if (response != null) {
-                    println("LOGIN: ${response}")
-                    _uiState.update { it.copy(isUserLogged = true) }
+                    if (response.error!= null) {
+                        if (response.error!=200){
+                            Log.i("LOGIN", "ERROR")
+                            _uiState.update { it.copy(errorMessage = translate(response.errorMessage), errorCode = 202) }
+                        }else{
+                            _uiState.update { it.copy(isUserLogged = false) }
+                        }
+                    }
                 }else{
                     Log.i("LOGIN", "ERROR")
                 }
@@ -71,10 +79,12 @@ class LoginViewModel @Inject constructor(val login: Login) : ViewModel() {
 }
 
 data class LoginUiState(
-    val email: String = "aris@aris.com",
-    val password: String = "123qwerty",
+    val email: String = "ricardojosemolin@gmail.com",
+    val password: String = "302211be",
     val isLoading: Boolean = false,
     val isLoginEnabled: Boolean = true,
     val isUserLogged:Boolean = false,
+    var errorCode:Int? = null,
+    var errorMessage:String? = null
 )
 

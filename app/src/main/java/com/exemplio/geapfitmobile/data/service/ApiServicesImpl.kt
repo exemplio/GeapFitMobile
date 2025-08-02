@@ -1,12 +1,19 @@
 package com.exemplio.geapfitmobile.data.service
 
+import ErrorResponse
+import HttpUtil
 import android.util.Log
-import com.example.geapfit.models.CredentialModel
+import com.exemplio.geapfitmobile.domain.entity.CredentialModel
+import com.exemplio.geapfitmobile.domain.entity.PasswordGrantRequest
+import com.exemplio.geapfitmobile.domain.entity.Resultado
 import com.exemplio.geapfitmobile.utils.MyUtils
 import com.geapfit.utils.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import kotlinx.serialization.json.Json
 import okhttp3.*
+import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.RequestBody.Companion.toRequestBody
 import java.io.IOException
 
 class ApiServicesImpl(
@@ -18,9 +25,7 @@ class ApiServicesImpl(
     private fun url(unencodedPath: String, queryParameters: Map<String, Any>? = null): Result<HttpUrl> {
         val isOnline = isOnlineProvider.isOnline()
         return try {
-            println("isOnline: $isOnline")
             if (isOnline) {
-                println("isOnline2")
                 val builder = HttpUrl.Builder()
                     .scheme("https")
                     .host(MyUtils.base)
@@ -40,54 +45,86 @@ class ApiServicesImpl(
         }
     }
 
-    private fun urlAuth(unencodedPath: String, queryParameters: Map<String, Any>? = null): HttpUrl {
-        val builder = HttpUrl.Builder()
-            .scheme("https")
-            .host(MyUtils.baseAuth)
-            .addEncodedPathSegments(unencodedPath)
-        queryParameters?.forEach { (key, value) ->
-            builder.addQueryParameter(key, value.toString())
+    private fun urlAuth(unencodedPath: String, queryParameters: Map<String, Any>? = null): Result<HttpUrl> {
+        val isOnline = isOnlineProvider.isOnline()
+        return try {
+            if (isOnline) {
+                val builder = HttpUrl.Builder()
+                    .scheme("https")
+                    .host(MyUtils.baseAuth)
+                    .addEncodedPathSegments(unencodedPath)
+                queryParameters?.forEach { (key, value) ->
+                    builder.addQueryParameter(key, value.toString())
+                }
+                Result.success(builder.build())
+            }
+            else {
+                println("isOnline3")
+                Result.failure(IOException("No posee conexión a internet"))
+            }
+        } catch (e: Exception) {
+            Log.e("UrlError", "Unexpected error in url builder", e)
+            return Result.failure(e)
         }
-        return builder.build()
     }
 
     private suspend fun <T> httpCall(
         f: suspend (OkHttpClient) -> Response,
-        parseJson: ((String) -> T)? = null
-    ): Result<T?> = withContext(Dispatchers.IO) {
+        parseJson: ((ResponseBody) -> T)? = null
+    ): Resultado<T?> = withContext(Dispatchers.IO) {
         try {
             val response = httpService.response(f)
-            val result = HttpUtil.result(response, parseJson)
-            Result.success(result.getOrNull())
+            val apiError = httpService.responseBody(f)?.let { Json.decodeFromString<ErrorResponse>(it) }
+            HttpUtil.result(response, parseJson, apiError).let { result ->
+                if (response.isSuccessful) {
+                    Log.v("Success", "API call succeeded")
+                    Resultado.success(response.body?.let { body ->
+                        if (body.contentLength() > 0) {
+                            val json = body.string()
+                            Log.v("ResponseBody", "Response body: $json")
+                            parseJson?.invoke(body)
+                        } else {
+                            Log.v("ResponseBody", "Empty response body")
+                            null
+                        }
+                    })
+                } else {
+                    println("Annotation: ${result} - ${response.message}")
+                    Resultado.identity(result)
+                }
+            }
         } catch (e: Exception) {
             Log.e("UnknownError", "Unexpected error", e)
-            Result.failure(Exception("Ocurrió un error inesperado", e))
+            Resultado.failMsg("Ocurrió un error inesperado", error = 0)
         }
     }
 
-//    suspend fun passwordGrant(request: PasswordGrantRequest): Result2<CredentialModel?> {
-//        val path = StaticNamesPath.passwordGrant.path
-//        val uri = urlAuth(
-//            "${MyUtils.typeAuth}$path",
-//            mapOf("key" to MyUtils.apiKey)
-//        )
-//        val headers = mapOf("Content-Type" to "application/json")
-//        return httpCall(
-//            f = { client ->
-//                val body = RequestBody.create(
-//                    "application/json".toMediaTypeOrNull(),
-//                    request.toJson()
-//                )
-//                val req = Request.Builder()
-//                    .url(uri)
-//                    .post(body)
-//                    .headers(headers.toHeaders())
-//                    .build()
-//                client.newCall(req).execute()
-//            },
-//            parseJson = { json -> return@httpCall CredentialModel.fromJson(json) }
-//        )
-//    }
+    suspend fun passwordGrant(request: PasswordGrantRequest): Resultado<Any?> {
+        val path = StaticNamesPath.passwordGrant.path
+        val uri = urlAuth(
+            "${MyUtils.typeAuth}$path",
+            mapOf("key" to MyUtils.apiKey)
+        )
+        val headers = mapOf("Content-Type" to "application/json")
+        return httpCall(
+            f = { client ->
+                val mediaType = "application/json; charset=utf-8".toMediaType()
+                val body = Json.encodeToString(request).toRequestBody(mediaType)
+                val httpUrl = uri.getOrNull()
+                    ?: throw uri.exceptionOrNull() ?: Exception("Invalid URL")
+                Log.v("Request", "HTTP request URL: $httpUrl")
+                Log.v("Request", "HTTP body: $body")
+                val req = Request.Builder()
+                    .url(httpUrl)
+                    .post(body)
+                    .headers(headers.toHeaders())
+                    .build()
+                client.newCall(req).execute()
+            },
+            parseJson = { json -> return@httpCall CredentialModel.fromJson(json.toString()) }
+        )
+    }
+
     suspend fun resendSign(param: CredentialModel): Result<Any> {
         return try {
             val params = mapOf("app-id" to MyUtils.clientId, "email" to param)

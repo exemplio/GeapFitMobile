@@ -23,15 +23,13 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        buildConfigField ("String", "AUTH_ID", "\"your_auth_id_value\"")
-        buildConfigField ("String", "CONTEXT_PATH", "\"your_context_path_value\"")
-        buildConfigField ("String", "CONTEXT_AUTH_PATH", "\"your_context_auth_path_value\"")
+        buildConfigField ("String", "AUTH_ID", "\"dfb8aca9-5259-4582-ad81-9ffe0ae75ad3\"")
+        buildConfigField ("String", "CONTEXT_PATH", "\"/v1/projects/loginproject-66446/databases/(default)/documents\"")
+        buildConfigField ("String", "CONTEXT_AUTH_PATH", "\"/v1/accounts\"")
         buildConfigField ("String", "CLIENT_ID", "\"your_client_id_value\"")
-        buildConfigField ("String", "API_URL", "\"https://api.example.com\"")
-        buildConfigField ("String", "API_AUTH_URL", "\"https://auth.example.com\"")
-        buildConfigField ("String", "PASSWORD_PUBLIC_KEY", "\"your_public_key_value\"")
-        buildConfigField ("String", "TYPE", "\"your_public_key_value\"")
-        buildConfigField ("String", "API_KEY", "\"your_public_key_value\"")
+        buildConfigField ("String", "API_URL", "\"firestore.googleapis.com\"")
+        buildConfigField ("String", "API_AUTH_URL", "\"identitytoolkit.googleapis.com\"")
+        buildConfigField ("String", "API_KEY", "\"AIzaSyCNGkGWhHJU8vSBEY37RYnDxTTQAC4sk-k\"")
     }
 
     buildTypes {

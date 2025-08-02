@@ -45,23 +45,17 @@ object MyUtils {
     }
 
     val authId = BuildConfig.AUTH_ID
-    val contextPath = BuildConfig.CONTEXT_PATH
-    val contextAuthPath = BuildConfig.CONTEXT_AUTH_PATH
+    val type = BuildConfig.CONTEXT_PATH
+    val typeAuth = BuildConfig.CONTEXT_AUTH_PATH
     val clientId = BuildConfig.CLIENT_ID
-    val type = BuildConfig.TYPE
     val base: String
         get() = BuildConfig.API_URL
 
     val baseAuth: String
         get() = BuildConfig.API_AUTH_URL
 
-    val publicKey: String
-        get() = BuildConfig.PASSWORD_PUBLIC_KEY
-
     val apiKey: String
         get() = BuildConfig.API_KEY
-
-    var uri: String = "$type/pin_pad/payment"
 
     var params: MutableMap<String, String> = mutableMapOf()
     var params2: MutableMap<String, String> = mutableMapOf()

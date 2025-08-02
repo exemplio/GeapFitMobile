@@ -2,7 +2,7 @@ package com.example.geapfit.services
 
 import android.content.Context
 import android.content.SharedPreferences
-import com.example.geapfit.models.CredentialModel
+import com.exemplio.geapfitmobile.domain.entity.CredentialModel
 import com.geapfit.network.NetworkState
 import com.google.gson.Gson
 import dagger.hilt.android.qualifiers.ApplicationContext
